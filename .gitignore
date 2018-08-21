@@ -1,0 +1,7 @@
+*.imm
+*.swp
+__pycache__/
+about.py
+layout.py
+s2p-view
+s2p-view.zip
