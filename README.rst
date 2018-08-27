@@ -15,9 +15,21 @@ Dependencies
 ============
 Python 3, matplotlib (Qt5Agg backend), pyqt5 (gui, widgets), scikit-rf
 
+If you are building from source, you also need:
+
+- make
+- pyuic5
+
 
 Building
 ========
-You also need make and pyuic5::
+::
 
-   $ make
+  $ make
+
+
+Usage
+=====
+::
+
+  $ ./s2p-view FILE
