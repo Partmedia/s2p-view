@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Copyright (c) 2018 Kevin Zheng
+Copyright (c) 2018, 2020 Kevin Zheng
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -44,6 +44,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_Open.triggered.connect(self.openDialog)
         self.enableSmith(self.comboDisplay.currentText())
         self.comboDisplay.currentTextChanged.connect(self.enableSmith)
+        self.checkS11.stateChanged.connect(self.plot)
+        self.checkS21.stateChanged.connect(self.plot)
+        self.checkS12.stateChanged.connect(self.plot)
+        self.checkS22.stateChanged.connect(self.plot)
         self.plotButton.pressed.connect(self.plot)
         self.show()
 
