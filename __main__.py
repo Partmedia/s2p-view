@@ -85,22 +85,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         s = self.comboDisplay.currentText()
         plot_fn = None
         if s == 'Magnitude':
-            plot_fn = lambda x: rf.Network.plot_s_db(x, ax=self.ax)
+            plot_fn = lambda x, m, n: x.plot_s_db(m=m, n=n, ax=self.ax)
         elif s == 'Phase':
-            plot_fn = lambda x: rf.Network.plot_s_deg(x, ax=self.ax)
+            plot_fn = lambda x, m, n: x.plot_s_deg(m=m, n=n, ax=self.ax)
         elif s == 'Smith':
-            plot_fn = lambda x: rf.Network.plot_s_smith(x, ax=self.ax,
+            plot_fn = lambda x, m, n: x.plot_s_smith(m=m, n=n, ax=self.ax,
                     draw_labels=self.checkLabels.isChecked(),
                     draw_vswr=self.checkVSWR.isChecked())
 
-        def plotIfChecked(c, n):
+        def plotIfChecked(c, m, n):
             if c.isChecked():
-                plot_fn(n())
+                plot_fn(data, m, n)
 
-        plotIfChecked(self.checkS11, lambda: data.s11)
-        plotIfChecked(self.checkS21, lambda: data.s21)
-        plotIfChecked(self.checkS12, lambda: data.s12)
-        plotIfChecked(self.checkS22, lambda: data.s22)
+        plotIfChecked(self.checkS11, 0, 0)
+        plotIfChecked(self.checkS21, 1, 0)
+        plotIfChecked(self.checkS12, 0, 1)
+        plotIfChecked(self.checkS22, 1, 1)
         self.canvas.draw()
         self.canvas.flush_events()
 
