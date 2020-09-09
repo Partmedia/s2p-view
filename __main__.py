@@ -95,12 +95,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         def plotIfChecked(c, n):
             if c.isChecked():
-                plot_fn(n)
+                plot_fn(n())
 
-        plotIfChecked(self.checkS11, data.s11)
-        plotIfChecked(self.checkS21, data.s21)
-        plotIfChecked(self.checkS12, data.s12)
-        plotIfChecked(self.checkS22, data.s22)
+        plotIfChecked(self.checkS11, lambda: data.s11)
+        plotIfChecked(self.checkS21, lambda: data.s21)
+        plotIfChecked(self.checkS12, lambda: data.s12)
+        plotIfChecked(self.checkS22, lambda: data.s22)
         self.canvas.draw()
         self.canvas.flush_events()
 
