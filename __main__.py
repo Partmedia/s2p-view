@@ -44,10 +44,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_Open.triggered.connect(self.openDialog)
         self.enableSmith(self.comboDisplay.currentText())
         self.comboDisplay.currentTextChanged.connect(self.enableSmith)
-        self.checkS11.stateChanged.connect(self.plot)
-        self.checkS21.stateChanged.connect(self.plot)
-        self.checkS12.stateChanged.connect(self.plot)
-        self.checkS22.stateChanged.connect(self.plot)
         self.plotButton.pressed.connect(self.plot)
         self.show()
 
