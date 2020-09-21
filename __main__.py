@@ -33,12 +33,16 @@ class AboutDialog(QDialog, Ui_About):
         self.setupUi(self)
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self, path):
+    def __init__(self, paths):
         super().__init__()
         self.fig = Figure()
         self.setupUi(self)
         self.about = AboutDialog()
-        self.open(path)
+
+        self.networks = []      # list of currently open rf.Network
+        self.network_dims = []  # max dimension of currently open networks
+
+        self.openMany(paths)
 
         self.actionAbout.triggered.connect(lambda: self.about.show())
         self.action_Open.triggered.connect(self.openDialog)
@@ -48,41 +52,50 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.show()
 
     def openDialog(self):
-        path, _ = QFileDialog.getOpenFileName(self,
+        paths, _ = QFileDialog.getOpenFileNames(self,
                 filter="S-Parameter Files (*.s?p)")
-        if len(path) > 0:
-            self.open(path)
+        if len(paths) > 0:
+            self.openMany(paths)
 
-    def open(self, path):
-        self.net = rf.Network(path)
-        dim = self.net.s.shape[1]
+    def checkDimEnable(self):
+        """
+        Enable/disable port plot checkboxes based on maximum currently-loaded
+        dimension.
+        """
+        dim = max(self.network_dims + [0])  # handle empty network_dims
         def checkEnable(checkbox, ndims):
             if ndims <= dim:
                 checkbox.setEnabled(True)
                 checkbox.setChecked(True)
             else:
                 checkbox.setEnabled(False)
+                checkbox.setChecked(False)
         checkEnable(self.checkS11, 1)
         checkEnable(self.checkS21, 2)
         checkEnable(self.checkS12, 2)
         checkEnable(self.checkS22, 2)
+
+    def open(self, path):
+        net = rf.Network(path)
+        dim = net.s.shape[1]
+        self.networks.append(net)
+        self.network_dims.append(dim)
+
+    def refreshNets(self):
+        self.checkDimEnable()
         self.plot()
 
-    def plot(self):
-        self.net.frequency.unit = self.comboUnit.currentText().lower()
-        data = self.net
-        r = self.lineRange.text()
-        if len(r) > 0:
-            try:
-                data = data[r]
-            except (ValueError, KeyError):
-                self.statusbar.showMessage("Invalid range!", 3000)
-                return
+    def openMany(self, paths):
+        for path in paths:
+            self.open(path)
+        self.refreshNets()
 
+    def plot(self):
         self.statusbar.showMessage("Plotting...", 1000)
         self.fig.clear()
         self.ax = self.fig.subplots()
         s = self.comboDisplay.currentText()
+
         plot_fn = None
         if s == 'Magnitude':
             plot_fn = lambda x, m, n: x.plot_s_db(m=m, n=n, ax=self.ax)
@@ -93,14 +106,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     draw_labels=self.checkLabels.isChecked(),
                     draw_vswr=self.checkVSWR.isChecked())
 
-        def plotIfChecked(c, m, n):
-            if c.isChecked():
-                plot_fn(data, m, n)
+        for data, dim in zip(self.networks, self.network_dims):
+            data.frequency.unit = self.comboUnit.currentText().lower()
+            r = self.lineRange.text()
+            if len(r) > 0:
+                try:
+                    data = data[r]
+                except (ValueError, KeyError):
+                    self.statusbar.showMessage("Invalid range!", 3000)
+                    return
 
-        plotIfChecked(self.checkS11, 0, 0)
-        plotIfChecked(self.checkS21, 1, 0)
-        plotIfChecked(self.checkS12, 0, 1)
-        plotIfChecked(self.checkS22, 1, 1)
+            def plotIfChecked(c, m, n):
+                if c.isChecked() and m < dim and n < dim:
+                    plot_fn(data, m, n)
+
+            plotIfChecked(self.checkS11, 0, 0)
+            plotIfChecked(self.checkS21, 1, 0)
+            plotIfChecked(self.checkS12, 0, 1)
+            plotIfChecked(self.checkS22, 1, 1)
+
         self.canvas.draw()
         self.canvas.flush_events()
 
@@ -110,9 +134,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print("usage: s2p-view FILE", file=sys.stderr)
-        sys.exit(1)
     app = QApplication([])
-    window = MainWindow(sys.argv[1])
+    window = MainWindow(sys.argv[1:])
     app.exec_()
