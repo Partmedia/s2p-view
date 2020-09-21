@@ -60,9 +60,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.openMany(paths)
 
     def savePlot(self):
-        path, _ = QFileDialog.getSaveFileName(self, filter="Images (*.png)")
+        path, _ = QFileDialog.getSaveFileName(self, filter="Plot Outputs (*.eps, *.pdf, *.pgf, *.png, *.ps, *.raw, *.rgba, *.svg, *.svgz)")
         if len(path) > 0:
-            self.fig.savefig(path)
+            try:
+                self.fig.savefig(path)
+            except Exception as e:
+                QMessageBox.critical(self, "Save Plot Error", str(e))
 
     def closeAll(self):
         self.networks = []
