@@ -117,6 +117,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             plot_fn = lambda x, m, n: x.plot_s_smith(m=m, n=n, ax=self.ax,
                     draw_labels=self.checkLabels.isChecked(),
                     draw_vswr=self.checkVSWR.isChecked())
+        elif s == 'Z Real':
+            plot_fn = lambda x, m, n: x.plot_z_re(m=m, n=n, ax=self.ax)
+        elif s == 'Z Imag':
+            plot_fn = lambda x, m, n: x.plot_z_im(m=m, n=n, ax=self.ax)
 
         for data, dim in zip(self.networks, self.network_dims):
             data.frequency.unit = self.comboUnit.currentText().lower()
