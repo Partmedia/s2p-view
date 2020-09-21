@@ -46,6 +46,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.actionAbout.triggered.connect(lambda: self.about.show())
         self.action_Open.triggered.connect(self.openDialog)
+        self.actionSave_Plot.triggered.connect(self.savePlot)
+        self.actionClose_All.triggered.connect(self.closeAll)
         self.enableSmith(self.comboDisplay.currentText())
         self.comboDisplay.currentTextChanged.connect(self.enableSmith)
         self.plotButton.pressed.connect(self.plot)
@@ -56,6 +58,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 filter="S-Parameter Files (*.s?p)")
         if len(paths) > 0:
             self.openMany(paths)
+
+    def savePlot(self):
+        path, _ = QFileDialog.getSaveFileName(self, filter="Images (*.png)")
+        if len(path) > 0:
+            self.fig.savefig(path)
+
+    def closeAll(self):
+        self.networks = []
+        self.network_dims = []
+        self.refreshNets()
 
     def checkDimEnable(self):
         """
