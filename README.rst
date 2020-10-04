@@ -32,4 +32,8 @@ Usage
 =====
 ::
 
-  $ ./s2p-view FILE
+  $ ./s2p-view [FILE]
+
+To install the MIME file type description and desktop icon for SnP files::
+
+  $ make desktop

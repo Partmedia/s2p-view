@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
+    <mime-type type="text/x-snp">
+        <comment>SnP (Touchstone) data</comment>
+        <glob pattern="*.s?p"/>
+    </mime-type>
+</mime-info>

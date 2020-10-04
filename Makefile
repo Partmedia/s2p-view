@@ -1,4 +1,4 @@
-.PHONY: build
+.PHONY: build desktop
 
 VERSION = 0.1.1
 
@@ -24,3 +24,7 @@ layout.py: layout.imm
 
 layout.imm: layout.ui
 	pyuic5 layout.ui -o $@
+
+desktop:
+	xdg-mime install mime-x-snp.xml
+	xdg-desktop-menu install s2p-view.desktop && xdg-desktop-menu forceupdate

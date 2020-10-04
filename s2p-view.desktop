@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=S2P View
+GenericName=SnP data viewer
+Exec=s2p-view %F
+StartupNotify=false
+Terminal=false
+Categories=Education;Science;DataVisualization
+MimeType=text/x-snp
