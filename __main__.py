@@ -42,7 +42,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.networks = []      # list of currently open rf.Network
         self.network_dims = []  # max dimension of currently open networks
 
-        self.openMany(paths)
+        try:
+            self.openMany(paths)
+        except Exception as e:
+            print("Could not open files:", str(e), file=sys.stderr)
+            quit()
 
         self.actionAbout.triggered.connect(lambda: self.about.show())
         self.action_Open.triggered.connect(self.openDialog)
@@ -57,7 +61,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         paths, _ = QFileDialog.getOpenFileNames(self,
                 filter="S-Parameter Files (*.s?p)")
         if len(paths) > 0:
-            self.openMany(paths)
+            try:
+                self.openMany(paths)
+            except Exception as e:
+                QMessageBox.critical(self, "Open Data Error", str(e))
 
     def savePlot(self):
         path, _ = QFileDialog.getSaveFileName(self, filter="Plot Outputs (*.eps, *.pdf, *.pgf, *.png, *.ps, *.raw, *.rgba, *.svg, *.svgz)")
