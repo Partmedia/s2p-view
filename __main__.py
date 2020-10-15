@@ -39,17 +39,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.about = AboutDialog()
 
+        self.paths = []         # list of s2p file paths
         self.networks = []      # list of currently open rf.Network
         self.network_dims = []  # max dimension of currently open networks
 
         try:
             self.openMany(paths)
+            self.refreshNets(autoCheck=True)
         except Exception as e:
             print("Could not open files:", str(e), file=sys.stderr)
             quit()
 
         self.actionAbout.triggered.connect(lambda: self.about.show())
         self.action_Open.triggered.connect(self.openDialog)
+        self.actionReload.triggered.connect(self.reload)
         self.actionSave_Plot.triggered.connect(self.savePlot)
         self.actionClose_All.triggered.connect(self.closeAll)
         self.enableSmith(self.comboDisplay.currentText())
@@ -63,6 +66,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if len(paths) > 0:
             try:
                 self.openMany(paths)
+                self.refreshNets(autoCheck=True)
             except Exception as e:
                 QMessageBox.critical(self, "Open Data Error", str(e))
 
@@ -74,12 +78,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             except Exception as e:
                 QMessageBox.critical(self, "Save Plot Error", str(e))
 
-    def closeAll(self):
+    def reload(self):
+        paths = self.paths
+        self.paths = []
         self.networks = []
         self.network_dims = []
-        self.refreshNets()
+        self.openMany(paths)
+        self.refreshNets(autoCheck=False)
 
-    def checkDimEnable(self):
+    def closeAll(self):
+        self.paths = []
+        self.networks = []
+        self.network_dims = []
+        self.refreshNets(autoCheck=True)
+
+    def checkDimEnable(self, autoCheck):
         """
         Enable/disable port plot checkboxes based on maximum currently-loaded
         dimension.
@@ -88,10 +101,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         def checkEnable(checkbox, ndims):
             if ndims <= dim:
                 checkbox.setEnabled(True)
-                checkbox.setChecked(True)
+                if autoCheck:
+                    checkbox.setChecked(True)
             else:
                 checkbox.setEnabled(False)
-                checkbox.setChecked(False)
+                if autoCheck:
+                    checkbox.setChecked(False)
         checkEnable(self.checkS11, 1)
         checkEnable(self.checkS21, 2)
         checkEnable(self.checkS12, 2)
@@ -100,17 +115,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def open(self, path):
         net = rf.Network(path)
         dim = net.s.shape[1]
+        self.paths.append(path)
         self.networks.append(net)
         self.network_dims.append(dim)
 
-    def refreshNets(self):
-        self.checkDimEnable()
+    def refreshNets(self, autoCheck):
+        self.checkDimEnable(autoCheck)
         self.plot()
 
     def openMany(self, paths):
         for path in paths:
             self.open(path)
-        self.refreshNets()
 
     def plot(self):
         self.statusbar.showMessage("Plotting...", 1000)
