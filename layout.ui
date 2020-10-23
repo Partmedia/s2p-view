@@ -74,6 +74,16 @@
           <string>Z Imag</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>Y Real</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Y Imag</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item>
