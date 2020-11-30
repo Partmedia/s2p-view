@@ -71,7 +71,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 QMessageBox.critical(self, "Open Data Error", str(e))
 
     def savePlot(self):
-        path, _ = QFileDialog.getSaveFileName(self, filter="Plot Outputs (*.eps, *.pdf, *.pgf, *.png, *.ps, *.raw, *.rgba, *.svg, *.svgz)")
+        path, _ = QFileDialog.getSaveFileName(self, filter="Plot Outputs (*.eps *.pdf *.pgf *.png *.ps *.raw *.rgba *.svg *.svgz)")
         if len(path) > 0:
             try:
                 self.fig.savefig(path)
