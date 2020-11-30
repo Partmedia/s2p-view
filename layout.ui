@@ -163,6 +163,16 @@
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="checkLegend">
+        <property name="text">
+         <string>Legend</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="plotButton">
         <property name="text">
          <string>Plot</string>

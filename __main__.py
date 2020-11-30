@@ -132,24 +132,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.fig.clear()
         self.ax = self.fig.subplots()
         s = self.comboDisplay.currentText()
+        legend = self.checkLegend.isChecked()
 
         plot_fn = None
         if s == 'Magnitude':
-            plot_fn = lambda x, m, n: x.plot_s_db(m=m, n=n, ax=self.ax)
+            plot_fn = lambda x, m, n: x.plot_s_db(m=m, n=n, ax=self.ax, show_legend=legend)
         elif s == 'Phase':
-            plot_fn = lambda x, m, n: x.plot_s_deg(m=m, n=n, ax=self.ax)
+            plot_fn = lambda x, m, n: x.plot_s_deg(m=m, n=n, ax=self.ax, show_legend=legend)
         elif s == 'Smith':
             plot_fn = lambda x, m, n: x.plot_s_smith(m=m, n=n, ax=self.ax,
                     draw_labels=self.checkLabels.isChecked(),
                     draw_vswr=self.checkVSWR.isChecked())
         elif s == 'Z Real':
-            plot_fn = lambda x, m, n: x.plot_z_re(m=m, n=n, ax=self.ax)
+            plot_fn = lambda x, m, n: x.plot_z_re(m=m, n=n, ax=self.ax, show_legend=legend)
         elif s == 'Z Imag':
-            plot_fn = lambda x, m, n: x.plot_z_im(m=m, n=n, ax=self.ax)
+            plot_fn = lambda x, m, n: x.plot_z_im(m=m, n=n, ax=self.ax, show_legend=legend)
         elif s == 'Y Real':
-            plot_fn = lambda x, m, n: x.plot_y_re(m=m, n=n, ax=self.ax)
+            plot_fn = lambda x, m, n: x.plot_y_re(m=m, n=n, ax=self.ax, show_legend=legend)
         elif s == 'Y Imag':
-            plot_fn = lambda x, m, n: x.plot_y_im(m=m, n=n, ax=self.ax)
+            plot_fn = lambda x, m, n: x.plot_y_im(m=m, n=n, ax=self.ax, show_legend=legend)
 
         for data, dim in zip(self.networks, self.network_dims):
             data.frequency.unit = self.comboUnit.currentText().lower()
