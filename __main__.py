@@ -42,6 +42,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.paths = []         # list of s2p file paths
         self.networks = []      # list of currently open rf.Network
         self.network_dims = []  # max dimension of currently open networks
+        self.labels = []
 
         try:
             self.openMany(paths)
@@ -83,6 +84,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.paths = []
         self.networks = []
         self.network_dims = []
+        self.labels = []
         self.openMany(paths)
         self.refreshNets(autoCheck=False)
 
@@ -90,6 +92,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.paths = []
         self.networks = []
         self.network_dims = []
+        self.labels = []
         self.refreshNets(autoCheck=True)
 
     def checkDimEnable(self, autoCheck):
@@ -114,10 +117,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def open(self, path):
         net = rf.Network(path)
+        label = None
+        with open(path) as f:
+            for l in f.readlines():
+                if len(l) > 0 and l[0] == '!':
+                    parts = l.strip().split(maxsplit=1)
+                    if parts[0] == '!Label' and len(parts) > 1:
+                        label = parts[1]
         dim = net.s.shape[1]
         self.paths.append(path)
         self.networks.append(net)
         self.network_dims.append(dim)
+        self.labels.append(label)
 
     def refreshNets(self, autoCheck):
         self.checkDimEnable(autoCheck)
@@ -134,25 +145,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         s = self.comboDisplay.currentText()
         legend = self.checkLegend.isChecked()
 
-        plot_fn = None
-        if s == 'Magnitude':
-            plot_fn = lambda x, m, n: x.plot_s_db(m=m, n=n, ax=self.ax, show_legend=legend)
-        elif s == 'Phase':
-            plot_fn = lambda x, m, n: x.plot_s_deg(m=m, n=n, ax=self.ax, show_legend=legend)
-        elif s == 'Smith':
-            plot_fn = lambda x, m, n: x.plot_s_smith(m=m, n=n, ax=self.ax,
-                    draw_labels=self.checkLabels.isChecked(),
-                    draw_vswr=self.checkVSWR.isChecked())
-        elif s == 'Z Real':
-            plot_fn = lambda x, m, n: x.plot_z_re(m=m, n=n, ax=self.ax, show_legend=legend)
-        elif s == 'Z Imag':
-            plot_fn = lambda x, m, n: x.plot_z_im(m=m, n=n, ax=self.ax, show_legend=legend)
-        elif s == 'Y Real':
-            plot_fn = lambda x, m, n: x.plot_y_re(m=m, n=n, ax=self.ax, show_legend=legend)
-        elif s == 'Y Imag':
-            plot_fn = lambda x, m, n: x.plot_y_im(m=m, n=n, ax=self.ax, show_legend=legend)
-
-        for data, dim in zip(self.networks, self.network_dims):
+        for data, dim, label in zip(self.networks, self.network_dims, self.labels):
             data.frequency.unit = self.comboUnit.currentText().lower()
             r = self.lineRange.text()
             if len(r) > 0:
@@ -164,6 +157,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             def plotIfChecked(c, m, n):
                 if c.isChecked() and m < dim and n < dim:
+                    plot_fn = None
+                    if s == 'Magnitude':
+                        if label == "NONE":
+                            plot_fn = lambda x, m, n: x.plot_s_db(m=m, n=n, ax=self.ax, show_legend=False, label="")
+                        elif label != None:
+                            plot_fn = lambda x, m, n: x.plot_s_db(m=m, n=n, ax=self.ax, show_legend=legend, label=label)
+                        else:
+                            plot_fn = lambda x, m, n: x.plot_s_db(m=m, n=n, ax=self.ax, show_legend=legend)
+                    elif s == 'Phase':
+                        plot_fn = lambda x, m, n: x.plot_s_deg(m=m, n=n, ax=self.ax, show_legend=legend)
+                    elif s == 'Smith':
+                        plot_fn = lambda x, m, n: x.plot_s_smith(m=m, n=n, ax=self.ax,
+                                draw_labels=self.checkLabels.isChecked(),
+                                draw_vswr=self.checkVSWR.isChecked())
+                    elif s == 'Z Real':
+                        plot_fn = lambda x, m, n: x.plot_z_re(m=m, n=n, ax=self.ax, show_legend=legend)
+                    elif s == 'Z Imag':
+                        plot_fn = lambda x, m, n: x.plot_z_im(m=m, n=n, ax=self.ax, show_legend=legend)
+                    elif s == 'Y Real':
+                        plot_fn = lambda x, m, n: x.plot_y_re(m=m, n=n, ax=self.ax, show_legend=legend)
+                    elif s == 'Y Imag':
+                        plot_fn = lambda x, m, n: x.plot_y_im(m=m, n=n, ax=self.ax, show_legend=legend)
+
                     plot_fn(data, m, n)
 
             plotIfChecked(self.checkS11, 0, 0)
