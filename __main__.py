@@ -165,6 +165,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                             plot_fn = lambda x, m, n: x.plot_s_db(m=m, n=n, ax=self.ax, show_legend=legend, label=label)
                         else:
                             plot_fn = lambda x, m, n: x.plot_s_db(m=m, n=n, ax=self.ax, show_legend=legend)
+                    elif s == 'Magnitude (Lin)':
+                        if label == "NONE":
+                            plot_fn = lambda x, m, n: x.plot_s_mag(m=m, n=n, ax=self.ax, show_legend=False, label="")
+                        elif label != None:
+                            plot_fn = lambda x, m, n: x.plot_s_mag(m=m, n=n, ax=self.ax, show_legend=legend, label=label)
+                        else:
+                            plot_fn = lambda x, m, n: x.plot_s_mag(m=m, n=n, ax=self.ax, show_legend=legend)
                     elif s == 'Phase':
                         plot_fn = lambda x, m, n: x.plot_s_deg(m=m, n=n, ax=self.ax, show_legend=legend)
                     elif s == 'Smith':
