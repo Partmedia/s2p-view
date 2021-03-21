@@ -27,49 +27,41 @@ import skrf as rf
 from about import Ui_About
 from layout import Ui_MainWindow
 
+paths = []         # list of s2p file paths
+networks = []      # list of currently open rf.Network
+network_dims = []  # max dimension of currently open networks
+labels = []
+
 class AboutDialog(QDialog, Ui_About):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self, paths):
+    def __init__(self):
         super().__init__()
         self.fig = Figure()
         self.setupUi(self)
         self.about = AboutDialog()
 
-        self.paths = []         # list of s2p file paths
-        self.networks = []      # list of currently open rf.Network
-        self.network_dims = []  # max dimension of currently open networks
-        self.labels = []
-
-        try:
-            self.openMany(paths)
-            self.refreshNets(autoCheck=True)
-        except Exception as e:
-            print("Could not open files:", str(e), file=sys.stderr)
-            quit()
-
         self.actionAbout.triggered.connect(lambda: self.about.show())
         self.action_Open.triggered.connect(self.openDialog)
-        self.actionReload.triggered.connect(self.reload)
+        self.actionReload.triggered.connect(reload)
         self.actionSave_Plot.triggered.connect(self.savePlot)
-        self.actionClose_All.triggered.connect(self.closeAll)
+        self.actionClose_All.triggered.connect(closeAll)
         self.enableSmith(self.comboDisplay.currentText())
         self.comboDisplay.currentTextChanged.connect(self.enableSmith)
         self.plotButton.pressed.connect(self.plot)
-        self.show()
 
     def openDialog(self):
         paths, _ = QFileDialog.getOpenFileNames(self,
                 filter="S-Parameter Files (*.s?p)")
         if len(paths) > 0:
             try:
-                existing_open = len(self.networks)
-                self.openMany(paths)
-                self.refreshNets(autoCheck=(existing_open == 0))
-            except Exception as e:
+                existing_open = len(networks)
+                openMany(paths)
+                refreshNets(autoCheck=(existing_open == 0))
+            except FileNotFoundError as e:
                 QMessageBox.critical(self, "Open Data Error", str(e))
 
     def savePlot(self):
@@ -80,28 +72,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             except Exception as e:
                 QMessageBox.critical(self, "Save Plot Error", str(e))
 
-    def reload(self):
-        paths = self.paths
-        self.paths = []
-        self.networks = []
-        self.network_dims = []
-        self.labels = []
-        self.openMany(paths)
-        self.refreshNets(autoCheck=False)
-
-    def closeAll(self):
-        self.paths = []
-        self.networks = []
-        self.network_dims = []
-        self.labels = []
-        self.refreshNets(autoCheck=True)
-
     def checkDimEnable(self, autoCheck):
         """
         Enable/disable port plot checkboxes based on maximum currently-loaded
         dimension.
         """
-        dim = max(self.network_dims + [0])  # handle empty network_dims
+        dim = max(network_dims + [0])  # handle empty network_dims
         def checkEnable(checkbox, ndims):
             if ndims <= dim:
                 checkbox.setEnabled(True)
@@ -116,29 +92,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         checkEnable(self.checkS12, 2)
         checkEnable(self.checkS22, 2)
 
-    def open(self, path):
-        net = rf.Network(path)
-        label = None
-        with open(path) as f:
-            for l in f.readlines():
-                if len(l) > 0 and l[0] == '!':
-                    parts = l.strip().split(maxsplit=1)
-                    if parts[0] == '!Label' and len(parts) > 1:
-                        label = parts[1]
-        dim = net.s.shape[1]
-        self.paths.append(path)
-        self.networks.append(net)
-        self.network_dims.append(dim)
-        self.labels.append(label)
-
-    def refreshNets(self, autoCheck):
-        self.checkDimEnable(autoCheck)
-        self.plot()
-
-    def openMany(self, paths):
-        for path in paths:
-            self.open(path)
-
     def plot(self):
         self.statusbar.showMessage("Plotting...", 1000)
         self.fig.clear()
@@ -146,7 +99,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         s = self.comboDisplay.currentText()
         legend = self.checkLegend.isChecked()
 
-        for data, dim, label in zip(self.networks, self.network_dims, self.labels):
+        for data, dim, label in zip(networks, network_dims, labels):
             data.frequency.unit = self.comboUnit.currentText().lower()
             r = self.lineRange.text()
             if len(r) > 0:
@@ -201,8 +154,55 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.comboUnit.setEnabled(t != 'Smith')
         self.smithBox.setEnabled(t == 'Smith')
 
+def openS2P(path):
+    net = rf.Network(path)
+    label = None
+    with open(path) as f:
+        for l in f.readlines():
+            if len(l) > 0 and l[0] == '!':
+                parts = l.strip().split(maxsplit=1)
+                if parts[0] == '!Label' and len(parts) > 1:
+                    label = parts[1]
+    dim = net.s.shape[1]
+    paths.append(path)
+    networks.append(net)
+    network_dims.append(dim)
+    labels.append(label)
+
+def refreshNets(autoCheck):
+    mainwin.checkDimEnable(autoCheck)
+    mainwin.plot()
+
+def openMany(paths):
+    for path in paths:
+        openS2P(path)
+
+def reload(self):
+    global paths, networks, network_dims, labels
+    old_paths = paths
+    paths = []
+    networks = []
+    network_dims = []
+    labels = []
+    openMany(old_paths)
+    refreshNets(autoCheck=False)
+
+def closeAll(self):
+    global paths, networks, network_dims, labels
+    paths = []
+    networks = []
+    network_dims = []
+    labels = []
+    refreshNets(autoCheck=True)
 
 if __name__ == '__main__':
     app = QApplication([])
-    window = MainWindow(sys.argv[1:])
+    mainwin = MainWindow()
+    mainwin.show()
+    try:
+        openMany(sys.argv[1:])
+        refreshNets(autoCheck=True)
+    except FileNotFoundError as e:
+        print("Could not open files:", str(e), file=sys.stderr)
+        quit()
     app.exec_()
