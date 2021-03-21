@@ -93,7 +93,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         checkEnable(self.checkS22, 2)
 
     def plot(self):
-        self.statusbar.showMessage("Plotting...", 1000)
+        self.statusbar.showMessage("Plotting...", 100)
+        app.processEvents()
         self.fig.clear()
         self.ax = self.fig.subplots()
         s = self.comboDisplay.currentText()
