@@ -66,8 +66,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 filter="S-Parameter Files (*.s?p)")
         if len(paths) > 0:
             try:
+                existing_open = len(self.networks)
                 self.openMany(paths)
-                self.refreshNets(autoCheck=True)
+                self.refreshNets(autoCheck=(existing_open == 0))
             except Exception as e:
                 QMessageBox.critical(self, "Open Data Error", str(e))
 
