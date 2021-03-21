@@ -158,34 +158,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             def plotIfChecked(c, m, n):
                 if c.isChecked() and m < dim and n < dim:
                     plot_fn = None
+                    args_dict = { 'm': m,
+                                  'n': n,
+                                  'ax': self.ax,
+                                  'show_legend': legend if label != "NONE" else False }
+                    if label != None:
+                        args_dict['label'] = label
+
                     if s == 'Magnitude':
-                        if label == "NONE":
-                            plot_fn = lambda x, m, n: x.plot_s_db(m=m, n=n, ax=self.ax, show_legend=False, label="")
-                        elif label != None:
-                            plot_fn = lambda x, m, n: x.plot_s_db(m=m, n=n, ax=self.ax, show_legend=legend, label=label)
-                        else:
-                            plot_fn = lambda x, m, n: x.plot_s_db(m=m, n=n, ax=self.ax, show_legend=legend)
+                        plot_fn = lambda x, m, n: x.plot_s_db(**args_dict)
                     elif s == 'Magnitude (Lin)':
-                        if label == "NONE":
-                            plot_fn = lambda x, m, n: x.plot_s_mag(m=m, n=n, ax=self.ax, show_legend=False, label="")
-                        elif label != None:
-                            plot_fn = lambda x, m, n: x.plot_s_mag(m=m, n=n, ax=self.ax, show_legend=legend, label=label)
-                        else:
-                            plot_fn = lambda x, m, n: x.plot_s_mag(m=m, n=n, ax=self.ax, show_legend=legend)
+                        plot_fn = lambda x, m, n: x.plot_s_mag(**args_dict)
                     elif s == 'Phase':
-                        plot_fn = lambda x, m, n: x.plot_s_deg(m=m, n=n, ax=self.ax, show_legend=legend)
+                        plot_fn = lambda x, m, n: x.plot_s_deg(**args_dict)
                     elif s == 'Smith':
-                        plot_fn = lambda x, m, n: x.plot_s_smith(m=m, n=n, ax=self.ax,
-                                draw_labels=self.checkLabels.isChecked(),
-                                draw_vswr=self.checkVSWR.isChecked())
+                        args_dict['draw_labels'] = self.checkLabels.isChecked()
+                        args_dict['draw_vswr'] = self.checkVSWR.isChecked()
+                        plot_fn = lambda x, m, n: x.plot_s_smith(**args_dict)
                     elif s == 'Z Real':
-                        plot_fn = lambda x, m, n: x.plot_z_re(m=m, n=n, ax=self.ax, show_legend=legend)
+                        plot_fn = lambda x, m, n: x.plot_z_re(**args_dict)
                     elif s == 'Z Imag':
-                        plot_fn = lambda x, m, n: x.plot_z_im(m=m, n=n, ax=self.ax, show_legend=legend)
+                        plot_fn = lambda x, m, n: x.plot_z_im(**args_dict)
                     elif s == 'Y Real':
-                        plot_fn = lambda x, m, n: x.plot_y_re(m=m, n=n, ax=self.ax, show_legend=legend)
+                        plot_fn = lambda x, m, n: x.plot_y_re(**args_dict)
                     elif s == 'Y Imag':
-                        plot_fn = lambda x, m, n: x.plot_y_im(m=m, n=n, ax=self.ax, show_legend=legend)
+                        plot_fn = lambda x, m, n: x.plot_y_im(**args_dict)
 
                     plot_fn(data, m, n)
 
