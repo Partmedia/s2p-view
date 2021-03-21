@@ -147,6 +147,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             plotIfChecked(self.checkS22, 1, 1)
 
         self.ax.grid('on')
+        self.fig.tight_layout()
 
         self.canvas.draw()
         self.canvas.flush_events()
