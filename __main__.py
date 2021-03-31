@@ -52,6 +52,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.enableSmith(self.comboDisplay.currentText())
         self.comboDisplay.currentTextChanged.connect(self.enableSmith)
         self.plotButton.pressed.connect(self.plot)
+        self.addToolBar(NavigationToolbar(self.canvas, self))
 
     def openDialog(self):
         paths, _ = QFileDialog.getOpenFileNames(self,
