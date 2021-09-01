@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Copyright (c) 2018, 2020 Kevin Zheng
+Copyright (c) 2018, 2020, 2021 Kevin Zheng
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -1,6 +1,6 @@
 .PHONY: build desktop
 
-VERSION = 0.1.1
+VERSION = 0.1.2
 
 SRCS = about.py layout.py __main__.py
 
