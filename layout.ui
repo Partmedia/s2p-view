@@ -94,11 +94,16 @@
       <item>
        <widget class="QComboBox" name="comboUnit">
         <property name="currentIndex">
-         <number>1</number>
+         <number>2</number>
         </property>
         <item>
          <property name="text">
           <string>Hz</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>kHz</string>
          </property>
         </item>
         <item>
