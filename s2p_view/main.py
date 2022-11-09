@@ -130,6 +130,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         args_dict['draw_labels'] = self.checkLabels.isChecked()
                         args_dict['draw_vswr'] = self.checkVSWR.isChecked()
                         plot_fn = lambda x, m, n: x.plot_s_smith(**args_dict)
+                    elif s == 'Z Mag':
+                        plot_fn = lambda x, m, n: x.plot_z_mag(**args_dict)
                     elif s == 'Z Real':
                         plot_fn = lambda x, m, n: x.plot_z_re(**args_dict)
                     elif s == 'Z Imag':

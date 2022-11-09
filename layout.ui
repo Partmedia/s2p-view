@@ -71,6 +71,11 @@
         </item>
         <item>
          <property name="text">
+          <string>Z Mag</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
           <string>Z Real</string>
          </property>
         </item>
