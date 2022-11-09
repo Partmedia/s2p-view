@@ -1,5 +1,6 @@
 *.imm
 *.swp
+.*~
 __pycache__/
 about.py
 layout.py
