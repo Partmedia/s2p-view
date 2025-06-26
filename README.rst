@@ -15,6 +15,10 @@ Dependencies
 ============
 Python 3, matplotlib (Qt5Agg backend), pyqt5 (gui, widgets), scikit-rf
 
+To install these dependencies using `pip`, use::
+
+  $ pip install --user matplotlib pyqt5 scikit-rf
+
 If you are building from source, you also need:
 
 - make
