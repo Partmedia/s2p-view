@@ -1,4 +1,4 @@
-.PHONY: build desktop
+.PHONY: build desktop package
 
 VERSION = 0.1.2
 
@@ -28,3 +28,6 @@ layout.imm: layout.ui
 desktop:
 	xdg-mime install mime-x-snp.xml
 	xdg-desktop-menu install s2p-view.desktop && xdg-desktop-menu forceupdate
+
+package:
+	pyinstaller --windowed --onefile -n s2p-view -p . --collect-submodules s2p_view __main__.py --hiddenimport scipy._cyutility

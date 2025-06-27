@@ -3,6 +3,8 @@
 .*~
 __pycache__/
 about.py
+dist/
 layout.py
 s2p-view
+s2p-view.spec
 s2p-view.zip
