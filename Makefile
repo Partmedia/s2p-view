@@ -1,6 +1,6 @@
 .PHONY: build desktop package
 
-VERSION = 0.1.2
+VERSION = 0.1.3
 
 SRCS = s2p_view/about.py s2p_view/layout.py s2p_view/main.py s2p_view/__init__.py __main__.py
 
@@ -13,7 +13,7 @@ s2p-view.zip: ${SRCS}
 
 build: s2p_view/about.py s2p_view/layout.py
 
-s2p_view/about.py: about.imm
+s2p_view/about.py: about.imm Makefile
 	sed -e 's/@VERSION@/${VERSION}/' about.imm > $@
 
 about.imm: about.ui
